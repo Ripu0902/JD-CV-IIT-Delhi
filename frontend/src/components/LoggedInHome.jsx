@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "remixicon/fonts/remixicon.css";
 
 const LoggedInHome = () => {
+  const [jobDescription, setJobDesription] = useState("");
   const [resumeCollection, setResumeCollection] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [extractedText, setExtractedText] = useState("");
@@ -12,20 +13,28 @@ const LoggedInHome = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (resumeCollection.length === 0) {
-      alert("Please upload at least one resume.");
+    if (jobDescription.trim() === "" || resumeCollection.length === 0) {
+      alert("Please fill out all fields!");
       return;
     }
 
+    console.log("Job Description:", jobDescription);
+    console.log("Resume Collection:", resumeCollection);
+
     const formData = new FormData();
-    resumeCollection.forEach((file) => formData.append("resumes", file)); // Ensure the field name matches backend
+    formData.append("job_description", jobDescription);
+    resumeCollection.forEach((file) => formData.append("resumes", file)); // Append multiple resumes
+
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
 
     try {
       setUploading(true);
 
-      const response = await fetch("http://localhost:5000/upload", {
+      const response = await fetch("http://127.0.0.1:8000/rank", {
         method: "POST",
-        body: formData,
+        body: formData, // Send FormData
       });
 
       if (!response.ok) {
@@ -33,14 +42,9 @@ const LoggedInHome = () => {
       }
 
       const data = await response.json();
-      console.log("Extracted Data:", data.extractedTexts);
-      setExtractedText(
-        data.extractedTexts
-          .map((item) => `${item.fileName}: ${item.text}`)
-          .join("\n\n")
-      );
+      setExtractedText(data.extractedText); // Store extracted text
 
-      navigate("/rankwise-resumes");
+      navigate("/rankwise-resumes"); // Navigate after upload success
     } catch (error) {
       console.error("Upload error:", error);
       alert("Error uploading files!");
@@ -66,6 +70,21 @@ const LoggedInHome = () => {
       <div className="flex w-[40%] ">
         <form onSubmit={submitHandler} className="w-full">
           <div className="flex flex-col">
+            <label
+              htmlFor="job-description"
+              className="font-medium pb-2 text-white cursor-text"
+            >
+              Job Description
+            </label>
+            <input
+              className="p-2 rounded-xl focus:outline-none shadow-xl my-1 mb-5"
+              type="text"
+              id="job-description"
+              placeholder="Frontend Engineer"
+              value={jobDescription}
+              onChange={(e) => setJobDesription(e.target.value)}
+            />
+
             <label
               htmlFor="resumes"
               className="font-medium pb-2 text-white cursor-pointer"

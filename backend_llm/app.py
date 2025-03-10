@@ -481,7 +481,7 @@ def create_app():
 
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:8080", "http://127.0.0.1:8080"],
+            "origins": ["http://localhost:5173", "http://127.0.0.1:8080"],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True
@@ -518,6 +518,8 @@ def create_app():
         """Rank resumes endpoint"""
         if request.method == 'POST':
             try:
+                print(request.form.get('job_description'))
+                print(request.form.getlist('resumes'))
                 job_description = request.form.get('job_description')
                 resumes = request.files.getlist('resumes')
 
