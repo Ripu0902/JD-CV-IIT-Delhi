@@ -64,19 +64,13 @@ const Home = () => {
         </Link>
       </div>
       <div className="flex flex-col justify-center items-center gap-8">
+        <div className="text-white text-3xl font-semibold p-5 rounded-full px-10 bg-yellow-600">
+          <p>Data formats for API Integration</p>
+        </div>
         <div className="bg-[#272822] text-white flex items-center justify-center w-[50%] p-10 rounded-3xl py-10">
           How to give data
         </div>
         <div className="bg-[#272822] text-white flex items-center justify-center w-[50%] rounded-3xl p-5">
-          {/* <ReactJson
-            src={data}
-            theme="monokai"
-            className="min-h-1/2"
-            shouldCollapse={() => false}
-            enableClipboard={false}
-            collapsed={false}
-            style={{ minHeight: "50%" }}
-          /> */}
           <pre className="whitespace-pre-wrap break-words ">
             {JSON.stringify(data, null, 2)}
           </pre>
