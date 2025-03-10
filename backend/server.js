@@ -1,11 +1,10 @@
 const express=require('express')
 const bodyParser=require('body-parser')
 const cors=require('cors')
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, GridFSBucket } = require("mongodb");
 const bcrypt=require('bcrypt')
 const crypto=require('crypto')
 require('dotenv').config();
-
 
 const app=express()
 const PORT=5000
@@ -33,7 +32,7 @@ async function connectToDatabase() {
   try {
     await client.connect();
     console.log("Connected to MongoDB!");
-    db = client.db("userDatabase"); // Replace with your database name
+    db = client.db("userDatabase"); 
   } catch (err) {
     console.error("Failed to connect to MongoDB:", err);
   }
