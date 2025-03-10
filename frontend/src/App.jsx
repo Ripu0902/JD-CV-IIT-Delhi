@@ -5,6 +5,7 @@ import Signup from "./components/signup";
 import Login from "./components/Login";
 import LoggedInHome from "./components/LoggedInHome";
 import APIscreen from "./components/APIscreen";
+import RankwiseResumes from "./components/RankwiseResumes";
 
 const App = () => {
   window.onload = () => {
@@ -18,6 +19,7 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/authorized" element={<LoggedInHome />} />
       <Route path="/api-screen" element={<APIscreen />} />
+      <Route path="/rankwise-resumes" element={<RankwiseResumes />} />
     </Routes>
   );
 };

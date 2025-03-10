@@ -6,8 +6,16 @@ const LoggedInHome = () => {
   const [jobDescription, setJobDesription] = useState("");
   const [resumeCollection, setResumeCollection] = useState([]);
 
+  const navigate = useNavigate();
+
   const submitHandler = (e) => {
     e.preventDefault();
+
+    if (jobDescription.trim !== "" && resumeCollection.length > 0) {
+      navigate("/rankwise-resumes");
+    } else {
+      alert("Either of the fields are empty");
+    }
   };
 
   useEffect(() => {
@@ -34,12 +42,12 @@ const LoggedInHome = () => {
           <div className="flex flex-col">
             <label
               htmlFor="job-description"
-              className="font-medium pb-2 text-white"
+              className="font-medium pb-2 text-white cursor-text"
             >
               Job Description
             </label>
             <input
-              className="p-2 rounded-xl focus:outline-none shadow-xl my-1 mb-3"
+              className="p-2 rounded-xl focus:outline-none shadow-xl my-1 mb-5"
               type="text"
               id="job-description"
               name="job-description"
@@ -49,11 +57,14 @@ const LoggedInHome = () => {
                 setJobDesription(e.target.value);
               }}
             />
-            <label htmlFor="resumes" className="font-medium pb-2 text-white">
+            <label
+              htmlFor="resumes"
+              className="font-medium pb-2 text-white cursor-pointer"
+            >
               Resumes:
             </label>
             <input
-              className="text-white"
+              className="text-white mb-5 p-2 cursor-pointer"
               type="file"
               name="resumes"
               id="resumes"
@@ -67,6 +78,9 @@ const LoggedInHome = () => {
                 ]);
               }}
             />
+            <button className="cursor-pointer text-white flex justify-center rounded-full p-4 mb-5 bg-yellow-600">
+              Submit
+            </button>
           </div>
         </form>
       </div>
