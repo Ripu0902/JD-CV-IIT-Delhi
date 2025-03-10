@@ -3,18 +3,49 @@ import { Link, useNavigate } from "react-router-dom";
 import "remixicon/fonts/remixicon.css";
 
 const LoggedInHome = () => {
-  const [jobDescription, setJobDesription] = useState("");
   const [resumeCollection, setResumeCollection] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [extractedText, setExtractedText] = useState("");
 
   const navigate = useNavigate();
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (jobDescription.trim !== "" && resumeCollection.length > 0) {
+    if (resumeCollection.length === 0) {
+      alert("Please upload at least one resume.");
+      return;
+    }
+
+    const formData = new FormData();
+    resumeCollection.forEach((file) => formData.append("resumes", file)); // Ensure the field name matches backend
+
+    try {
+      setUploading(true);
+
+      const response = await fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const data = await response.json();
+      console.log("Extracted Data:", data.extractedTexts);
+      setExtractedText(
+        data.extractedTexts
+          .map((item) => `${item.fileName}: ${item.text}`)
+          .join("\n\n")
+      );
+
       navigate("/rankwise-resumes");
-    } else {
-      alert("Either of the fields are empty");
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Error uploading files!");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -33,30 +64,8 @@ const LoggedInHome = () => {
         </Link>
       </div>
       <div className="flex w-[40%] ">
-        <form
-          onSubmit={(e) => {
-            submitHandler(e);
-          }}
-          className="w-full"
-        >
+        <form onSubmit={submitHandler} className="w-full">
           <div className="flex flex-col">
-            <label
-              htmlFor="job-description"
-              className="font-medium pb-2 text-white cursor-text"
-            >
-              Job Description
-            </label>
-            <input
-              className="p-2 rounded-xl focus:outline-none shadow-xl my-1 mb-5"
-              type="text"
-              id="job-description"
-              name="job-description"
-              placeholder="Frontend Engineer"
-              value={jobDescription}
-              onChange={(e) => {
-                setJobDesription(e.target.value);
-              }}
-            />
             <label
               htmlFor="resumes"
               className="font-medium pb-2 text-white cursor-pointer"
@@ -66,21 +75,28 @@ const LoggedInHome = () => {
             <input
               className="text-white mb-5 p-2 cursor-pointer"
               type="file"
-              name="resumes"
               id="resumes"
               accept=".pdf"
               multiple
               onChange={(e) => {
                 const uploadedFiles = Array.from(e.target.files);
-                setResumeCollection((prevCollection) => [
-                  ...prevCollection,
-                  ...uploadedFiles,
-                ]);
+                setResumeCollection([...uploadedFiles]);
               }}
             />
-            <button className="cursor-pointer text-white flex justify-center rounded-full p-4 mb-5 bg-yellow-600">
-              Submit
+
+            <button
+              className="cursor-pointer text-white flex justify-center rounded-full p-4 mb-5 bg-yellow-600"
+              disabled={uploading}
+            >
+              {uploading ? "Uploading..." : "Submit"}
             </button>
+
+            {extractedText && (
+              <div className="bg-white p-4 rounded-lg shadow-lg text-black">
+                <h3 className="font-bold">Extracted Text:</h3>
+                <pre>{extractedText}</pre>
+              </div>
+            )}
           </div>
         </form>
       </div>

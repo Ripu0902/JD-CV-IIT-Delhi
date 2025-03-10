@@ -4,6 +4,9 @@ const cors=require('cors')
 const { MongoClient, ServerApiVersion, GridFSBucket } = require("mongodb");
 const bcrypt=require('bcrypt')
 const crypto=require('crypto')
+const fs=require('fs')
+const multer=require('multer')
+const pdfParse=require('pdf-parse')
 require('dotenv').config();
 
 const app=express()
@@ -119,6 +122,42 @@ app.post('/get-api-key', async (req,res)=>{
     }
 })
 
+const upload = multer({ dest: "uploads/" });
+
+// Accept multiple files using 'array' instead of 'single'
+app.post("/upload", upload.array("resumes", 10), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).send("No files uploaded.");
+    }
+
+    console.log('Req.body',req.files);
+
+    let extractedTexts = [];
+
+    for (const file of req.files) {
+      const filePath = file.path;
+      console.log("Uploaded File:", file);
+
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).send("File not found.");
+      }
+
+      const dataBuffer = fs.readFileSync(filePath);
+      const pdfData = await pdfParse(dataBuffer);
+
+      extractedTexts.push({ fileName: file.originalname, text: pdfData.text });
+    }
+
+    res.json({
+      message: "Files uploaded successfully",
+      extractedTexts,
+    });
+  } catch (error) {
+    console.error("Error processing files:", error);
+    res.status(500).send("Error processing files.");
+  }
+});
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
