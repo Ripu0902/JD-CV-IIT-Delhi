@@ -88,7 +88,7 @@ def process_resumes():
 
 def init_client():
     try:
-        api_key = "5901a698-5366-4fa1-9d2e-e06ff436a321"
+        api_key = "your-api-key"
         if not api_key:
             print("Error: SAMBANOVA_API_KEY not found in userdata")
             raise ValueError("API key not found")
